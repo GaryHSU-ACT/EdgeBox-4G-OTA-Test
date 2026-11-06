@@ -3,9 +3,18 @@ ACT NKUT EdgeBox-ESP-100 4G OTA 遠端韌體更新測試與版本管理
 
 本儲存庫提供 EdgeBox application 韌體及 OTA 更新資訊，原始碼與歷史備份保留於本機。
 
-目前 OTA 最新版：**2.1.22**。供目前正式2.1.21沿用原登入與感測設定，新增需明確配對啟用的獨立診斷心跳。從原本地後台手動更新；發布不代表設備已更新或回報診斷。
+目前 OTA 最新版：**2.1.23**。修正 2.1.22 登入後白畫面，沿用原設定、登入、感測器、風向校正、手動 OTA 及資料補傳規則。發布不會觸發設備自動安裝。
 
 ## 版本更新紀錄
+
+### 2.1.23 — 2026-11-06
+
+- 2.1.22 的 68,028-byte 設定頁超過未啟用 PSRAM 時 Arduino String 容量；改從 Flash 每段最多 1,024 bytes 傳送，保留完整 HTML、token 及精確 Content-Length。
+- 45 份原始檔逐 byte 不變；只調整 PortalAuth.h、版本 config.h，新增 PortalPageResponse.h。登入驗證、網路、感測器、風向、OTA 信任公鑰、NVS 與補傳程式、分割表不變；僅提供 application 映像。
+- 20 組本機 C++ 回歸、Chrome／Edge localhost 測試與相同 core 3.3.12 編譯通過。2026-11-05 USB 紀錄確認同一映像以 COM4 只寫 app1，開機前 NVS／佇列區／otadata／分割表與備份一致；之後原帳密登入及 68,051-byte 設定頁重新載入成功。
+- USB 結果不等於本次已完成無線 OTA 升級驗收；正常運行後設定與佇列仍依原規則變化。勿清除 Flash 或覆寫檔案系統。
+
+Application 1,297,504 bytes，SHA-256 `d460b545b81e9ecd3d7afc65a655c242e8491020b0096c437aaaf5f39010ef83`。兩個 1,310,720-byte OTA 槽不變，實際映像槽餘量 13,216 bytes；靜態 RAM 55,800 bytes，不代表已量測動態 heap。
 
 ### 2.1.22 — 2026-11-04
 
