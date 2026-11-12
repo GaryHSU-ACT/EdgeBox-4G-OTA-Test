@@ -1,11 +1,24 @@
-# EdgeBox-4G-OTA-Test
-ACT NKUT EdgeBox-ESP-100 4G OTA 遠端韌體更新測試與版本管理
+# CoGrow / EdgeBox-4G-OTA-Test
+ACT NKUT EdgeBox-ESP-100 application 韌體與簽章 OTA 版本管理；完整來源及歷史備份保留於本機專案。
 
-本儲存庫提供 EdgeBox application 韌體及 OTA 更新資訊，原始碼與歷史備份保留於本機。
+目前 OTA 最新版：**2.1.26 — 容量部署基線（app-only）**。
 
-目前 OTA 最新版：**2.1.25 本機匯入頁測試版（app OTA only）**。保留手動 OTA、網路與感測器設定；已發布不代表設備已安裝或實機驗收。
+## 2.1.26 使用與驗證範圍
+
+- 本版只從正式2.1.25變更版本號，並提供自訂雙4MiB分區的來源建置配置；既有本機登入、手動OTA、Wi-Fi/4G手選與恢復、感測器清單/ID、風向校正、資料格式與簽章ACK/補傳邏輯保留。開機不自動檢查或安裝更新，不自動切換網路；上傳新機預設停用，升級保留已有設定，不會自行開啟或關閉。
+- **本次GitHub只發布application，普通OTA不包含/不改分區表、bootloader、NVS、FS或otadata，不會把舊槽擴成4MiB。** 已正常運行2.1.25且本地憑證/儲存資格正常的設備，可沿原設定頁手動檢查，再另按開始更新。此app為1,306,256 bytes，舊1,310,720-byte槽餘4,464；已受控遷移的4,194,304-byte槽餘2,888,048。updater仍核對設備真正target partition大小，正式工具的舊大小上限不放寬。
+- 首次雙4MiB分區遷移必須是另行核准的受控USB維護，先驗身份/布局並完成受保護全片備份、精確寫入與讀回；不得直接從IDE上傳整包，也不得用merged映像刷現役設備，否則可能覆蓋原資料。僅取得新版app不代表已遷移。
+- 2026-11-12本台已完成雙高位app/新表寫入與讀回；原bootloader、NVS、FS、otadata未寫，重啟後Wi-Fi新boot回報2.1.26，採樣ok、儲存ready及伺服器ACK201。只證明至少一個高位槽啟動及首次Wi-Fi最小驗收，**不是無線OTA測試**。本台已是2.1.26，檢查更新顯示相同版本/沒有新版是正常結果。
+- application SHA-256：`95ab714527eeb561245690f5928ea94ec0bdc55fcbffb604e1850f73e6c4af3e`。沿用同一已核/已實機映像，本次發布不重編。靜態RAM57,352 bytes，不等於運行heap/stack峰值。
+- 第二高位槽實際boot、雙向OTA/rollback、4G本次收件、斷電注入及長期穩定仍未驗；本輪未逐項重新比較所有設定/校正語義及感測器最新值。CG新身份、手機免檔案配對與網站遠端檢查/安裝未包含在本版。
 
 ## 版本更新紀錄
+
+### 2.1.26 — 2026-11-12（容量部署基線；app-only OTA）
+
+採正式2.1.25的84檔，加自訂分區CSV為完整85檔；只改版本號及建置配置，沒有匯入未發布配對/remote worker。完整來源、精確app、建置及本台首次遷移/新Wi-Fi boot證據逐hash固定；發布使用既有P-256信任、公鑰與五欄固定commit清單。app大小仍適合已知舊/新槽；未遷移的設備不會因本次OTA改布局。
+
+
 
 ### 2.1.25 — 2026-11-08（本機匯入頁測試版，app OTA only）
 
@@ -187,13 +200,13 @@ application 1,265,360 bytes，SHA256 `a1d3ad410ac210a8d1d927930a7773148bb87a17dc
 
 ## OTA 檔案與操作
 
-- `firmware.bin`：編譯後的 application，非 bootloader、分區表或 merged image。
-- `version.txt`：版本號，保留供舊測試流程使用。
-- `agri-manifest.txt`：目前整合版使用的更新清單，含版本、板型、大小、SHA-256 及固定 commit 下載網址。
-- `agri-manifest.txt.sig`：清單的 ECDSA-P256 簽章，與設備既有信任公鑰核對；缺少／不一致會拒絕更新。
+- `firmware.bin`：application；非bootloader、分區表或merged。
+- `version.txt`：版本號，保留給舊測試流程。
+- `agri-manifest.txt`：version/board/size/sha256/url五欄，url固定到真實application Git commit。
+- `agri-manifest.txt.sig`：既有ECDSA-P256簽章；設備核公鑰/簽章與映像SHA，不一致則拒更新。
 
-首次安裝須接線燒入具 OTA 功能的整合版與正確分區配置。2.1.5 以上從設定頁先按「檢查更新」，再另按「開始更新」；序列 `c` 也只檢查。新版保留 OTA 與相同分區設定。上方較舊版本的自動 OTA 敘述只代表當時行為。
+2.1.5以上設定頁『檢查更新』與『開始更新』分開；序列c只檢查。發布不等設備已裝。既有有效本地NVS與儲存狀態是必要條件，本版不是任意空機/舊版初始化包。共用main清單未做單機隔離；仍用早期自動OTA的設備可能自行嘗試，README不會阻止下載；只恢復舊清單不會讓已安裝設備自動降版。
 
 ## 目前限制
 
-這是開發驗證版。OTA 已有 ECDSA-P256 來源簽章及 SHA-256 完整性驗證，尚未配置 OTA TLS CA 驗證或新版本開機失敗自動回退。選用資料上傳另使用設定的 HTTPS CA 與設備 HMAC，與 OTA 通道分開。Wi-Fi 設定尚未啟用 Flash 加密；Wi-Fi 未支援 Enterprise 帳號認證或需網頁登入的網路。網站／資料庫尚未正式接入，上傳預設停用。
+OTA已有P-256來源簽章及SHA完整性驗證；既有OTA通道尚未配置TLS CA驗證或合格的新版開機失敗自動回退。資料/診斷上傳另用HTTPS CA、獨立設備驗證與簽章ACK，與OTA通道分開；網站/資料庫已接入既有感測與診斷，本台本輪Wi-Fi ACK201僅代表該次新boot最小結果，不代表所有網路/感測器/長期狀態通過。Wi-Fi設定尚未使用Flash加密，不支援Enterprise或需網頁登入的Wi-Fi。新配對和網站遠端OTA仍待後續，不會因分區容量增加自動取得這些功能。
