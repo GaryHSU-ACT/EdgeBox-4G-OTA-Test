@@ -1,7 +1,16 @@
 # CoGrow / EdgeBox-4G-OTA-Test
 ACT NKUT EdgeBox-ESP-100 application 韌體與簽章 OTA 版本管理；完整來源及歷史備份保留於本機專案。
 
-目前 OTA 最新版：**2.1.28 — 帶E3修復；僅已遷移雙4MiB設備（app-only）**。
+目前 OTA 最新版：**2.1.29 — LTE標頭尾端修復；僅已遷移雙4MiB設備（app-only）**。
+
+## 2.1.29 — 2026-11-16（LTE網站更新檢查修復）
+
+- 修正A76XX HTTPHEAD標頭最後一欄尚未結束的處理：bounded讀取exact實際AT尾端、拒絕pending CR、重新strict解析最後欄位與全部CL/MAC/encoding/status/length界限；LTE專屬省略空白行契約，不合成收到的HTTP bytes。
+- 對應修復的未發布27實機已完成17次完整交換及網站顯示有新版；乾淨29來源經精確去純觀測後與它101檔逐byte等價，同59例及synthetic634/UART比較與單次完整SDK通過。這不代表29已完成網站OTA安裝驗收。
+- 移除RFORMAT/HOBS/WANTRACE純診斷；保留認證清理、4G冷恢復、手動OTA、網路/感測器ID清單、風向校正、資料補傳及原設定。不開機自動更新，不自動切換Wi-Fi/4G。
+- **只適用已核准遷移並驗證的16MiB/雙4MiB設備。** app-only 1357616 bytes，SHA256 `ef69fbf0417b163bd7436ccce714a99aa9882a481227ae29da680727f493115b`；超過舊1310720-byte槽，不能用普通OTA遷移分區或抬高通用舊槽限制。不得寫bootloader/table/otadata/NVS/FS。
+- 靜態RAM60488 bytes，不是runtime峰值；nonce/TTL runtime未在本輪host重跑，來源與安全規則保持。舊版來源、簽章清單及Git歷史備份保留。
+- 共用main通道，非單機隔離；發布後仍須另外驗收網頁手動安裝。恢復舊清單不會使已安裝設備自動降版。
 
 ## 2.1.28 — 2026-11-15（網站OTA測試目標；實機資格分開）
 
