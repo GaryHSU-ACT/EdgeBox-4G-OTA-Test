@@ -1,5 +1,5 @@
-version=2.1.29
+version=2.1.32
 board=edgebox-esp100-agri-rs485-v1
-size=1357616
-sha256=ef69fbf0417b163bd7436ccce714a99aa9882a481227ae29da680727f493115b
-url=https://raw.githubusercontent.com/GaryHSU-ACT/EdgeBox-4G-OTA-Test/aca0aa679b4487d15c0583a07be10be7169cbdc8/firmware.bin
+size=1371472
+sha256=4698f61c47334e4473309311f800dce0f626d39c2cb502b95cd8e48a12446897
+url=https://raw.githubusercontent.com/GaryHSU-ACT/EdgeBox-4G-OTA-Test/3e69597d66d1139e5cff8b5cb26dd9d3128557db/firmware.bin
